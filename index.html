@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE COMPUTCH - Metallic Edition v3.5 (Mobile Print Fix)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Rajdhani:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- THEME CONFIGURATION --- */
+        :root {
+            --bg-dark: #050505;
+            --gold-mid: #C5A059;   
+            --gold-dark: #8B6914;  
+        }
+
+        /* TEXTURE DEFINITION (Global) */
+        .bg-texture {
+            background-color: var(--bg-dark);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+
+        body { font-family: 'Inter', sans-serif; color: #e5e5e5; }
+        .font-tech { font-family: 'Rajdhani', sans-serif; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-mid); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Metallic Text Effects */
+        .text-gold-metallic {
+            background: linear-gradient(to bottom, #FCEFA0 10%, #C5A059 50%, #8B6914 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 0px rgba(0,0,0,0.5));
+        }
+
+        .border-gold { border-color: #8B6914; }
+        .bg-gold-gradient {
+            background: linear-gradient(135deg, #C5A059 0%, #8B6914 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .bg-gold-gradient:hover {
+            background: linear-gradient(135deg, #D4AF37 0%, #A07818 100%);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in { animation: slideIn 0.3s ease-out forwards; }
+
+        /* --- PRINT & VIEWER STYLES (UPDATED FIX) --- */
+        
+        /* SCREEN VIEW (The Preview Modal) */
+        .paper-sheet {
+            width: 297mm; 
+            height: 209mm; /* A4 Landscape */
+            display: flex; 
+            flex-direction: row;
+            background: white; 
+            color: black; 
+            overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform-origin: center top; 
+        }
+
+        .print-sidebar {
+            background-color: #080808 !important;
+            border-right: 1px solid #C5A059 !important;
+            /* Force background image to print */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E") !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .print-gold-text { color: #C5A059 !important; -webkit-print-color-adjust: exact; }
+        .print-gold-bg { background-color: #C5A059 !important; -webkit-print-color-adjust: exact; }
+        .print-black-header { background-color: #000 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        .print-border-gold { border-color: #C5A059 !important; -webkit-print-color-adjust: exact; }
+
+        /* --- ACTUAL PRINT OVERRIDES (THE MOBILE FIX) --- */
+        @media print {
+            @page { 
+                size: A4 landscape; 
+                margin: 0; 
+            }
+
+            html, body {
+                width: 297mm; /* Force A4 width */
+                height: 210mm; /* Force A4 height */
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white;
+                overflow: visible !important;
+            }
+
+            /* HIDE THE APP UI COMPLETELY */
+            #app-layout, #loading-screen, #quote-viewer-toolbar {
+                display: none !important;
+            }
+
+            /* RESET THE VIEWER CONTAINER */
+            #quote-viewer {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                z-index: 9999;
+                visibility: visible !important;
+                overflow: visible !important;
+            }
+
+            /* FORCE THE SHEET TO FILL THE PAGE WITHOUT SHADOWS/SCALING */
+            .paper-sheet {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            /* Fix for Text Colors on Mobile Print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-texture overflow-hidden h-screen selection:bg-[#C5A059] selection:text-black">
+
+    <div id="loading-screen" class="fixed inset-0 bg-[#050505] flex items-center justify-center z-50">
+        <div class="flex flex-col items-center animate-pulse">
+            <div class="text-7xl font-black font-tech tracking-tighter italic text-gold-metallic mb-4" style="transform: skew(-10deg);">ACE</div>
+            <div class="text-neutral-500 font-bold font-tech tracking-[0.3em] text-sm">LOADING ENGINE...</div>
+        </div>
+    </div>
+
+    <div id="app-layout" class="hidden flex h-screen">
+        <aside class="w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col z-20 print:hidden relative">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMWExYTFhIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiIG9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4=')] opacity-10 pointer-events-none"></div>
+            
+            <div class="p-6 flex items-center gap-3 border-b border-[#1a1a1a] relative z-10">
+                <div class="flex flex-col">
+                    <h1 class="text-5xl font-black font-tech italic text-gold-metallic leading-none tracking-tighter" style="transform: skew(-10deg);">ACE</h1>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-1 relative z-10" id="sidebar-nav"></nav>
+            <div class="p-4 border-t border-[#1a1a1a] relative z-10">
+                <div class="flex items-center gap-3 px-3 py-2 text-sm text-neutral-400 bg-[#111] border border-[#222]">
+                    <div class="w-8 h-8 bg-gradient-to-br from-[#C5A059] to-[#8B6914] flex items-center justify-center text-white font-bold text-xs shadow-lg">A</div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="truncate font-bold text-[#C5A059] font-tech uppercase tracking-wider">Admin</p>
+                        <p class="text-[10px] text-neutral-500 flex items-center gap-1 uppercase tracking-wider">● Online</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-auto relative" id="main-content">
+            <div id="view-dashboard" class="view-section p-8 max-w-7xl mx-auto"></div>
+            <div id="view-create" class="view-section hidden p-8 max-w-6xl mx-auto h-full overflow-auto"></div>
+            <div id="view-quotes" class="view-section hidden p-8 max-w-7xl mx-auto h-full flex flex-col"></div>
+            <div id="view-billing" class="view-section hidden p-8 max-w-5xl mx-auto h-full overflow-auto"></div>
+            <div id="view-settings" class="view-section hidden p-8 max-w-4xl mx-auto h-full overflow-auto"></div>
+        </main>
+    </div>
+
+    <div id="quote-viewer" class="hidden fixed inset-0 bg-black z-50 overflow-auto flex flex-col">
+        <div id="quote-viewer-toolbar" class="bg-[#111] border-b border-[#222] px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+            <button id="btn-viewer-back" class="flex items-center gap-2 text-neutral-400 hover:text-[#C5A059] font-tech font-bold uppercase transition-colors">
+                <i data-lucide="arrow-left"></i> Back to Builder
+            </button>
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="bg-gold-gradient px-6 py-2 uppercase font-tech font-bold tracking-wider hover:brightness-110 transition-all shadow-[0_0_15px_rgba(197,160,89,0.3)] flex items-center gap-2 rounded-sm text-sm">
+                    <i data-lucide="printer" size="16"></i> Print Document
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 p-8 overflow-auto flex justify-center bg-[#050505] print:bg-white print:p-0">
+            <div id="quote-viewer-content" class="paper-sheet relative text-sm text-black">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & State ---
+        const BLUEPRINT_ITEMS = [
+            "CPU", "GRAPHICS CARD", "MOTHERBOARD", "RAM", "STORAGE 1", 
+            "STORAGE 2", "CPU COOLER", "PSU", "CABINET", "CABINET FANS",
+            "MONITOR", "KEYBOARD", "MOUSE", "HEADPHONES", "OTHERS"
+        ];
+
+        const state = {
+            activeTab: 'dashboard',
+            quotations: [],
+            bills: [], 
+            settings: {
+                companyName: 'ACE COMPUTECH',
+                email: 'contact@acecomputech.com',
+                address: '9-5-102/A, OTV Office, Hyderabad - 500031',
+                phone: '97048-12052',
+                logoUrl: '' 
+            },
+            editingQuote: null,
+            foundQuoteForBill: null
+        };
+
+        const DB_KEY = 'ace_computech_metallic_v5_final';
+
+        // --- DOM Cache ---
+        const dom = {
+            loading: document.getElementById('loading-screen'),
+            app: document.getElementById('app-layout'),
+            sidebarNav: document.getElementById('sidebar-nav'),
+            views: {
+                dashboard: document.getElementById('view-dashboard'),
+                create: document.getElementById('view-create'),
+                quotes: document.getElementById('view-quotes'),
+                billing: document.getElementById('view-billing'),
+                settings: document.getElementById('view-settings'),
+            },
+            quoteViewer: document.getElementById('quote-viewer'),
+            quoteViewerContent: document.getElementById('quote-viewer-content'),
+            btnViewerBack: document.getElementById('btn-viewer-back')
+        };
+
+        // --- Initialization ---
+        function init() {
+            loadData();
+            setTimeout(() => {
+                dom.loading.classList.add('hidden');
+                dom.app.classList.remove('hidden');
+                renderSidebar();
+                navigateTo('dashboard');
+            }, 800);
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(DB_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.quotations = parsed.quotations || [];
+                    state.bills = parsed.bills || []; 
+                    if(parsed.settings) state.settings = { ...state.settings, ...parsed.settings };
+                }
+            } catch (e) {
+                console.error("Data load error", e);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(DB_KEY, JSON.stringify({
+                    quotations: state.quotations,
+                    bills: state.bills, 
+                    settings: state.settings
+                }));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert("STORAGE FULL! Please delete old quotes.");
+                }
+            }
+        }
+
+        // --- GLOBAL DATE FORMATTER (DD MM YY) ---
+        function formatDate(dateStr) {
+            if(!dateStr) return '';
+            const d = new Date(dateStr);
+            if(isNaN(d.getTime())) return dateStr;
+            const day = d.getDate().toString().padStart(2, '0');
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const year = d.getFullYear().toString().slice(-2); 
+            return `${day} ${month} ${year}`;
+        }
+
+        function navigateTo(tabName) {
+            state.activeTab = tabName;
+            Object.values(dom.views).forEach(el => el.classList.add('hidden'));
+            if (dom.views[tabName]) {
+                dom.views[tabName].classList.remove('hidden');
+                if (tabName === 'dashboard') renderDashboard();
+                if (tabName === 'quotes') renderQuotesList();
+                if (tabName === 'create') renderQuoteBuilder();
+                if (tabName === 'billing') renderBillingTab(); 
+                if (tabName === 'settings') renderSettings();
+            }
+            renderSidebar();
+        }
+
+        window.handleNav = (id) => {
+            if (id === 'create') state.editingQuote = null; 
+            navigateTo(id);
+        };
+
+        // --- Sidebar ---
+        function renderSidebar() {
+            const items = [
+                { id: 'dashboard', icon: 'layout-dashboard', label: 'Dashboard' },
+                { id: 'create', icon: 'plus-circle', label: state.editingQuote ? 'Edit Quotation' : 'New Quotation' },
+                { id: 'quotes', icon: 'file-text', label: 'Quote History' },
+                { type: 'header', label: 'Finance' },
+                { id: 'billing', icon: 'receipt', label: 'Billing / Invoice' },
+                { type: 'header', label: 'System' },
+                { id: 'settings', icon: 'settings', label: 'Settings' }
+            ];
+
+            dom.sidebarNav.innerHTML = items.map(item => {
+                if (item.type === 'header') return `<div class="pt-6 pb-2 text-[10px] font-bold text-[#555] uppercase tracking-[0.2em] pl-4 font-tech border-b border-[#1a1a1a] mb-2">${item.label}</div>`;
+                const active = state.activeTab === item.id;
+                return `
+                    <button onclick="window.handleNav('${item.id}')" 
+                        class="w-full flex items-center gap-3 px-4 py-3 border-l-2 transition-all duration-300 group ${active ? 'border-[#C5A059] bg-[#111] text-[#C5A059]' : 'border-transparent text-neutral-500 hover:text-[#F3E5AB] hover:bg-[#0e0e0e]'}">
+                        <i data-lucide="${item.icon}" size="18" class="${active ? 'text-[#C5A059]' : 'text-neutral-600 group-hover:text-[#F3E5AB]'}"></i>
+                        <span class="font-bold font-tech uppercase tracking-wider text-sm">${item.label}</span>
+                    </button>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // --- Dashboard ---
+        function renderDashboard() {
+            const recent = [...state.quotations].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+            dom.views.dashboard.innerHTML = `
+                <header class="mb-10 border-b border-[#222] pb-6">
+                    <h2 class="text-5xl font-black text-white font-tech uppercase tracking-tighter italic">Command <span class="text-gold-metallic">Center</span></h2>
+                    <p class="text-neutral-600 mt-2 font-mono text-xs">SYSTEM STATUS: ONLINE // USER: ADMIN</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-[#0c0c0c] p-6 border-l-4 border-[#8B6914] shadow-lg group hover:bg-[#111] transition-colors relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-[#C5A059] opacity-5 rounded-bl-full"></div>
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="p-4 bg-black border border-[#222] text-[#C5A059] shadow-inner"><i data-lucide="file-text"></i></div>
+                            <div><p class="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Total Quotes</p><h3 class="text-4xl font-black text-white font-tech italic">${state.quotations.length}</h3></div>
+                        </div>
+                    </div>
+                    <div class="bg-[#0c0c0c] p-6 border-l-4 border-[#8B6914] shadow-lg group hover:bg-[#111] transition-colors relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-[#C5A059] opacity-5 rounded-bl-full"></div>
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="p-4 bg-black border border-[#222] text-[#C5A059] shadow-inner"><i data-lucide="receipt"></i></div>
+                            <div><p class="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Total Bills</p><h3 class="text-4xl font-black text-white font-tech italic">${state.bills.length}</h3></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-[#0c0c0c] border border-[#1a1a1a]">
+                    <div class="p-6 border-b border-[#1a1a1a] flex justify-between items-center bg-[#080808]">
+                        <h3 class="font-bold text-[#C5A059] font-tech uppercase tracking-widest text-lg">Recent Operations</h3>
+                        <button onclick="window.handleNav('quotes')" class="text-neutral-500 text-xs hover:text-white transition-colors uppercase font-bold tracking-wider">View All Logs</button>
+                    </div>
+                    <div class="divide-y divide-[#1a1a1a]">
+                        ${recent.length ? recent.map(q => `
+                            <div class="p-4 flex items-center justify-between hover:bg-[#111] transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-[#050505] flex items-center justify-center font-bold font-mono text-xs text-[#8B6914] border border-[#222]">ID</div>
+                                    <div>
+                                        <p class="font-bold text-white font-tech uppercase text-lg leading-none">${q.clientName}</p>
+                                        <p class="text-[10px] text-neutral-600 font-mono mt-1">REF: ${q.quoteNumber}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-[#C5A059] font-tech text-xl">₹${(parseFloat(q.total) || 0).toLocaleString()}</p>
+                                    <button onclick="window.viewQuote('${q.id}', 'quote')" class="text-[10px] text-neutral-500 hover:text-white uppercase tracking-wider font-bold mt-1">Print Document</button>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="p-8 text-center text-neutral-600 font-mono text-xs">NO DATA AVAILABLE</div>'}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- BILLING TAB LOGIC ---
+        function renderBillingTab() {
+            const sortedBills = [...state.bills].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            dom.views.billing.innerHTML = `
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black text-white font-tech uppercase italic">Billing <span class="text-gold-metallic">Terminal</span></h2>
+                </div>
+
+                <div class="bg-[#0c0c0c] p-8 border border-[#222] mb-8 relative">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-[#8B6914]"></div>
+                    <label class="block text-xs font-bold mb-4 text-neutral-500 uppercase tracking-widest">Generate New Invoice (Search Quote ID)</label>
+                    <div class="flex gap-4">
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="absolute left-4 top-3.5 text-neutral-600"></i>
+                            <input type="text" id="bill-search-input" onkeyup="window.handleBillSearch(this.value)" placeholder="e.g. 9876543210/291125" 
+                                class="w-full bg-[#050505] border border-[#333] text-white pl-12 pr-4 py-3 focus:border-[#C5A059] outline-none font-mono text-lg transition-colors tracking-widest uppercase">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bill-result-area" class="animate-slide-in hidden mb-12">
+                </div>
+
+                <div class="mt-8 border-t border-[#222] pt-8">
+                    <div class="flex justify-between items-end mb-6">
+                        <h3 class="text-xl font-black text-white font-tech uppercase italic">Invoice History</h3>
+                        <div class="relative w-full max-w-md">
+                            <i data-lucide="search" class="absolute left-3 top-3 text-neutral-500 w-5 h-5"></i>
+                            <input type="text" onkeyup="window.handleBillHistorySearch(this.value)" placeholder="Search Name, Invoice No, Date..." 
+                                class="w-full bg-[#080808] border border-[#222] text-white rounded-none pl-10 pr-4 py-2 focus:border-[#C5A059] outline-none font-tech tracking-wide placeholder-neutral-600 transition-colors">
+                        </div>
+                    </div>
+                    <div class="bg-[#0c0c0c] border border-[#222] overflow-hidden">
+                        <table class="w-full text-left text-sm text-neutral-400">
+                            <thead class="bg-[#080808] text-neutral-500 border-b border-[#222] font-tech uppercase tracking-widest text-xs">
+                                <tr><th class="p-4">Date</th><th class="p-4">Invoice No</th><th class="p-4">Client</th><th class="p-4 text-right">Amount</th><th class="p-4 text-right">Actions</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#1a1a1a]" id="bill-history-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            renderBillRows(sortedBills);
+            lucide.createIcons();
+        }
+
+        function renderBillRows(data) {
+             const tbody = document.getElementById('bill-history-table-body');
+             if(!tbody) return;
+
+             if (data.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-neutral-600 font-mono text-xs">NO RECORDS FOUND</td></tr>`;
+                 return;
+             }
+
+             tbody.innerHTML = data.map(b => `
+                <tr class="hover:bg-[#111] transition-colors">
+                    <td class="p-4 font-mono text-xs">${formatDate(b.date)}</td>
+                    <td class="p-4 font-bold text-[#8B6914] font-mono text-xs">${b.invoiceNumber}</td>
+                    <td class="p-4 font-bold text-white font-tech uppercase">${b.clientName}</td>
+                    <td class="p-4 text-right font-bold font-tech text-lg text-[#C5A059]">₹${parseFloat(b.total).toLocaleString()}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="window.viewQuote('${b.id}', 'saved-bill')" class="text-neutral-500 hover:text-[#C5A059] mr-2 transition-colors flex items-center gap-1 inline-flex uppercase text-[10px] font-bold tracking-wider border border-[#333] px-2 py-1 hover:border-[#C5A059]">
+                            <i data-lucide="printer" size="14"></i> Print
+                        </button>
+                        <button onclick="window.deleteBill('${b.id}')" class="text-red-900 hover:text-red-500 transition-colors inline-flex"><i data-lucide="trash-2" size="14"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.handleBillHistorySearch = (query) => {
+            const lower = query.toLowerCase();
+            const filtered = state.bills.filter(b => {
+                return (
+                    b.clientName.toLowerCase().includes(lower) ||
+                    b.invoiceNumber.toLowerCase().includes(lower) ||
+                    formatDate(b.date).includes(lower) ||
+                    b.total.toString().includes(lower)
+                );
+            });
+            renderBillRows(filtered);
+        };
+
+        window.handleBillSearch = (query) => {
+            const area = document.getElementById('bill-result-area');
+            if(!query || query.length < 3) {
+                area.innerHTML = '';
+                area.classList.add('hidden');
+                return;
+            }
+
+            const match = state.quotations.find(q => q.quoteNumber.includes(query));
+            
+            if(match) {
+                state.foundQuoteForBill = match;
+                area.classList.remove('hidden');
+                area.innerHTML = `
+                    <div class="bg-[#0c0c0c] border border-[#222] overflow-hidden">
+                        <div class="p-4 bg-[#080808] border-b border-[#222] flex justify-between items-center">
+                            <h3 class="font-bold text-white font-tech uppercase tracking-widest">Quote Found</h3>
+                            <span class="text-[#C5A059] text-xs font-mono">REF: ${match.quoteNumber}</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <p class="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Customer Name</p>
+                                <h2 class="text-3xl font-black text-white font-tech uppercase italic mb-4">${match.clientName}</h2>
+                                <p class="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Total Amount</p>
+                                <p class="text-4xl font-bold text-[#C5A059] font-tech">₹${parseFloat(match.total).toLocaleString()}</p>
+                            </div>
+                            <div class="flex justify-end">
+                                <button onclick="window.saveBillFromSearch()" class="bg-gold-gradient px-8 py-4 uppercase font-tech font-bold tracking-wider hover:brightness-110 shadow-[0_0_20px_rgba(197,160,89,0.2)] flex items-center gap-3 text-lg rounded-sm transition-all transform hover:scale-105">
+                                    <i data-lucide="save"></i> Generate & Save Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            } else {
+                area.innerHTML = `<div class="p-8 text-center text-neutral-600 font-mono text-sm border border-[#222] bg-[#0c0c0c]">NO RECORD FOUND FOR ID "${query}"</div>`;
+                area.classList.remove('hidden');
+            }
+        };
+
+        window.saveBillFromSearch = () => {
+            if(!state.foundQuoteForBill) return;
+            const quote = state.foundQuoteForBill;
+            
+            // Create Bill Object
+            const billId = 'bill_' + Date.now();
+            const invNum = quote.quoteNumber; 
+            const newBill = {
+                id: billId,
+                invoiceNumber: invNum,
+                originalQuoteId: quote.id,
+                clientName: quote.clientName,
+                clientAddress: quote.clientAddress,
+                clientContact: quote.clientContact,
+                items: JSON.parse(JSON.stringify(quote.items)), // Clone items
+                total: quote.total,
+                date: new Date().toISOString().split('T')[0],
+                createdAt: new Date().toISOString()
+            };
+
+            state.bills.push(newBill);
+            saveData();
+            
+            // Refresh View
+            document.getElementById('bill-search-input').value = '';
+            document.getElementById('bill-result-area').innerHTML = '';
+            document.getElementById('bill-result-area').classList.add('hidden');
+            renderBillingTab(); // Updates the table
+            
+            // Optional: Auto open the new bill
+            if(confirm('Invoice Saved Successfully! View it now?')) {
+                window.viewQuote(billId, 'saved-bill');
+            }
+        };
+
+        window.deleteBill = (id) => {
+            if(confirm('Are you sure you want to delete this invoice? This cannot be undone.')) {
+                state.bills = state.bills.filter(b => b.id !== id);
+                saveData();
+                renderBillingTab();
+            }
+        };
+
+        // --- Quote Builder ---
+        let builderItems = [];
+        function renderQuoteBuilder() {
+            const isEdit = !!state.editingQuote;
+            const data = state.editingQuote || {};
+            if (isEdit) builderItems = JSON.parse(JSON.stringify(data.items));
+            else builderItems = BLUEPRINT_ITEMS.map(cat => ({ id: Date.now() + Math.random(), category: cat, name: '', imageUrl: '' }));
+            const today = new Date().toISOString().split('T')[0];
+            const validDefault = new Date(); validDefault.setDate(validDefault.getDate() + 7); 
+
+            dom.views.create.innerHTML = `
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-black text-white font-tech uppercase italic">${isEdit ? 'Modify Config' : 'Initialize Build'}</h2>
+                    <div class="flex gap-2">
+                        <button onclick="window.handleNav('quotes')" class="px-4 py-2 text-neutral-500 hover:text-white font-tech uppercase font-bold tracking-wider">Discard</button>
+                        <button onclick="window.saveQuote()" class="bg-gold-gradient px-6 py-2 uppercase font-tech font-bold tracking-wider shadow-[0_0_15px_rgba(197,160,89,0.3)] flex items-center gap-2 rounded-sm text-sm">
+                            <i data-lucide="save" size="16"></i> Save Quote
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-[#0c0c0c] p-6 border border-[#222] mb-6 relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-[#8B6914]"></div>
+                    <h3 class="font-bold text-[#C5A059] mb-4 flex items-center gap-2 font-tech uppercase tracking-widest text-lg">Client Data</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Entity Name</label><input id="qb-c-name" value="${data.clientName || ''}" class="w-full p-2 bg-[#050505] border border-[#333] text-white focus:border-[#C5A059] outline-none font-tech text-lg transition-colors"></div>
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Address</label><input id="qb-c-address" value="${data.clientAddress || ''}" class="w-full p-2 bg-[#050505] border border-[#333] text-white focus:border-[#C5A059] outline-none font-tech text-lg transition-colors"></div>
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Contact</label><input id="qb-c-contact" value="${data.clientContact || ''}" class="w-full p-2 bg-[#050505] border border-[#333] text-white focus:border-[#C5A059] outline-none font-tech text-lg transition-colors"></div>
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Date</label><input id="qb-date" type="date" value="${data.quoteDate || today}" class="w-full p-2 bg-[#050505] border border-[#333] text-white focus:border-[#C5A059] outline-none text-sm"></div>
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Valid Until</label><input id="qb-valid" type="date" value="${data.validUntil || validDefault.toISOString().split('T')[0]}" class="w-full p-2 bg-[#050505] border border-[#333] text-white focus:border-[#C5A059] outline-none text-sm"></div>
+                        <div><label class="block text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Quote Ref</label><input disabled value="${data.quoteNumber || 'AUTO-GEN'}" class="w-full p-2 bg-[#111] border border-[#222] text-neutral-600 font-mono text-xs"></div>
+                    </div>
+                </div>
+                <div class="bg-[#0c0c0c] border border-[#222] overflow-hidden mb-6">
+                    <div class="p-4 bg-[#080808] border-b border-[#222]"><h3 class="font-bold text-white font-tech uppercase tracking-widest">System Architecture</h3></div>
+                    <div id="qb-items-list" class="divide-y divide-[#1a1a1a]"></div>
+                </div>
+                <div class="flex justify-end">
+                    <div class="w-full md:w-1/3 bg-[#0c0c0c] p-6 border border-[#222]">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl text-white font-tech uppercase italic">Total Estimate</span>
+                            <div class="flex items-center text-[#C5A059]">
+                                <span class="text-xl font-bold mr-1">₹</span>
+                                <input id="qb-manual-total" type="number" value="${data.total || ''}" placeholder="0" class="w-32 text-right bg-transparent border-b-2 border-[#8B6914] text-3xl font-black font-tech text-white focus:outline-none focus:border-[#C5A059]">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderBuilderItems();
+        }
+
+        window.renderBuilderItems = () => {
+            document.getElementById('qb-items-list').innerHTML = builderItems.map((item, idx) => {
+                const isCabinet = item.category === 'CABINET';
+                return `
+                <div class="p-3 flex flex-col md:flex-row gap-4 items-center group hover:bg-[#111] transition-colors">
+                    ${isCabinet ? `<div class="w-16 h-16 shrink-0 border border-[#333] bg-black flex items-center justify-center relative cursor-pointer hover:border-[#C5A059] transition-colors" title="Click to upload Cabinet Image for Print View">
+                        ${item.imageUrl ? `<img src="${item.imageUrl}" class="w-full h-full object-contain">` : `<i data-lucide="image-plus" class="text-neutral-600"></i>`}
+                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.uploadItemImage(${idx}, this)">
+                    </div>` : `<div class="w-16 shrink-0"></div>`}
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 w-full items-center">
+                        <div class="md:col-span-1"><div class="p-2 bg-[#050505] border border-[#222] text-[10px] font-bold text-[#8B6914] text-center uppercase tracking-[0.1em] font-mono">${item.category}</div></div>
+                        <div class="md:col-span-3 flex gap-2">
+                            <input id="item-input-${idx}" value="${item.name}" onchange="window.updateItem(${idx}, 'name', this.value)" placeholder="Enter specification..." class="flex-1 p-2 bg-transparent border-b border-[#333] text-white focus:border-[#C5A059] outline-none font-tech text-lg placeholder-neutral-700 transition-colors">
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        window.updateItem = (idx, field, val) => builderItems[idx][field] = val;
+        window.uploadItemImage = (idx, input) => { if(input.files[0]) handleImageUpload(input, null, (url) => { builderItems[idx].imageUrl = url; renderBuilderItems(); }); };
+
+        window.saveQuote = () => {
+            const cName = document.getElementById('qb-c-name').value;
+            const total = parseFloat(document.getElementById('qb-manual-total').value);
+            if(!cName) return alert('Input Client Name'); if(isNaN(total)) return alert('Input Total');
+            let quoteId = state.editingQuote ? state.editingQuote.quoteNumber : null;
+            if (!quoteId) {
+                const cleanPhone = document.getElementById('qb-c-contact').value.replace(/\D/g, '').slice(-10) || '0000';
+                const d = new Date(document.getElementById('qb-date').value);
+                quoteId = `${cleanPhone}/${d.getDate().toString().padStart(2,'0')}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getFullYear().toString().slice(-2)}`;
+            }
+            const quote = { id: state.editingQuote ? state.editingQuote.id : 'q_' + Date.now(), quoteNumber: quoteId, clientName: cName, clientAddress: document.getElementById('qb-c-address').value, clientContact: document.getElementById('qb-c-contact').value, items: builderItems, total: total, quoteDate: document.getElementById('qb-date').value, validUntil: document.getElementById('qb-valid').value, createdAt: new Date().toISOString() };
+            if(state.editingQuote) { state.quotations[state.quotations.findIndex(q => q.id === quote.id)] = quote; } else { state.quotations.push(quote); }
+            saveData(); navigateTo('quotes');
+        };
+
+        // --- Quotes List ---
+        function renderQuotesList(filteredData = null) {
+            const dataToShow = filteredData || state.quotations;
+            dataToShow.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            dom.views.quotes.innerHTML = `
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-2xl font-black text-white font-tech uppercase italic">Transaction Logs</h2>
+                    
+                    <div class="relative w-full max-w-md">
+                        <i data-lucide="search" class="absolute left-3 top-3 text-neutral-500 w-5 h-5"></i>
+                        <input type="text" id="quote-search-input" onkeyup="window.handleSearch(this.value)" placeholder="Search Name, ID, Date, or Amount..." 
+                            class="w-full bg-[#080808] border border-[#222] text-white rounded-none pl-10 pr-4 py-2 focus:border-[#C5A059] outline-none font-tech tracking-wide placeholder-neutral-600 transition-colors">
+                    </div>
+                </div>
+
+                <div class="bg-[#0c0c0c] border border-[#222] overflow-hidden">
+                    <table class="w-full text-left text-sm text-neutral-400">
+                        <thead class="bg-[#080808] text-neutral-500 border-b border-[#222] font-tech uppercase tracking-widest text-xs">
+                            <tr><th class="p-4">Date</th><th class="p-4">Ref ID</th><th class="p-4">Client</th><th class="p-4 text-right">Value</th><th class="p-4 text-right">Ops</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#1a1a1a]" id="quotes-table-body">
+                            </tbody>
+                    </table>
+                </div>`;
+            
+            renderQuoteRows(dataToShow);
+            lucide.createIcons();
+        }
+
+        function renderQuoteRows(data) {
+            const tbody = document.getElementById('quotes-table-body');
+            if(!tbody) return;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-neutral-600 font-mono text-xs">NO RECORDS FOUND</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(q => `
+                <tr class="hover:bg-[#111] transition-colors">
+                    <td class="p-4 font-mono text-xs">${formatDate(q.quoteDate)}</td>
+                    <td class="p-4 font-bold text-[#8B6914] font-mono text-xs">${q.quoteNumber}</td>
+                    <td class="p-4 font-bold text-white font-tech uppercase">${q.clientName}</td>
+                    <td class="p-4 text-right font-bold font-tech text-lg text-[#C5A059]">₹${parseFloat(q.total).toLocaleString()}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="window.editQuote('${q.id}')" class="text-blue-500 mr-2 hover:text-white transition-colors"><i data-lucide="pencil" size="16"></i></button>
+                        <button onclick="window.viewQuote('${q.id}', 'quote')" class="text-neutral-500 hover:text-[#C5A059] mr-2 transition-colors"><i data-lucide="printer" size="16"></i></button>
+                        <button onclick="window.deleteQuote('${q.id}')" class="text-red-800 hover:text-red-500 transition-colors"><i data-lucide="trash-2" size="16"></i></button>
+                    </td>
+                </tr>`).join('');
+            lucide.createIcons();
+        }
+
+        window.handleSearch = (query) => {
+            const lowerQuery = query.toLowerCase();
+            const filtered = state.quotations.filter(q => {
+                return (
+                    q.clientName.toLowerCase().includes(lowerQuery) ||
+                    q.quoteNumber.toLowerCase().includes(lowerQuery) ||
+                    formatDate(q.quoteDate).includes(lowerQuery) ||
+                    q.total.toString().includes(lowerQuery)
+                );
+            });
+            renderQuoteRows(filtered);
+        };
+
+        window.editQuote = (id) => { state.editingQuote = state.quotations.find(q => q.id === id); navigateTo('create'); };
+        window.deleteQuote = (id) => { if(confirm('Delete record?')) { state.quotations = state.quotations.filter(q => q.id !== id); saveData(); renderQuotesList(); } };
+
+        // --- PRINT VIEW (Updated for Billing) ---
+        window.viewQuote = (id, type) => {
+            // Type can be 'quote', 'bill' (preview), or 'saved-bill'
+            let dataObject = null;
+            let docTitle = 'QUOTATION';
+            let idLabel = 'REF ID';
+            let displayId = '';
+
+            if (type === 'saved-bill') {
+                dataObject = state.bills.find(b => b.id === id);
+                docTitle = 'TAX INVOICE';
+                idLabel = 'INVOICE NO';
+                displayId = dataObject ? dataObject.invoiceNumber : '';
+            } else {
+                dataObject = state.quotations.find(q => q.id === id);
+                if (type === 'bill') { docTitle = 'TAX INVOICE'; idLabel = 'INVOICE NO'; } // Previewing as bill
+                displayId = dataObject ? dataObject.quoteNumber : '';
+            }
+
+            if(!dataObject) return;
+
+            dom.quoteViewer.classList.remove('hidden');
+            dom.btnViewerBack.onclick = () => dom.quoteViewer.classList.add('hidden');
+            const s = state.settings;
+            const cabinetItem = dataObject.items.find(i => i.category.includes('CABINET'));
+            const cabinetImg = cabinetItem && cabinetItem.imageUrl ? cabinetItem.imageUrl : null;
+
+            // Logic: If Bill (saved or preview), show Signatures. If Quote, show Terms.
+            const isBill = type === 'bill' || type === 'saved-bill';
+            const bottomSection = isBill
+                ? `
+                    <div class="mt-auto border-t-2 border-black pt-2 flex justify-between items-end shrink-0">
+                        <div class="w-1/2 flex justify-between items-end pr-8">
+                             <div class="text-center">
+                                <div class="border-b border-black w-32 mb-1"></div>
+                                <p class="text-[8px] font-bold uppercase tracking-widest text-black">Customer Signature</p>
+                             </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400">Total Bill Amount</p>
+                            <div class="text-6xl font-black font-tech print-gold-text tracking-tighter leading-none mt-1 drop-shadow-sm">
+                                ₹${parseFloat(dataObject.total).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                `
+                : `
+                    <div class="mt-auto border-t-2 border-black pt-2 flex justify-between items-end shrink-0">
+                        <div class="text-[8px] text-neutral-500 w-1/2">
+                            <p class="font-bold text-black uppercase mb-1 tracking-widest border-b border-neutral-200 pb-0.5 inline-block">Terms & Conditions</p>
+                            <ul class="list-disc pl-3 space-y-0.5">
+                                <li>Pricing inclusive of GST (18%).</li>
+                                <li>50% advance payment required for order confirmation.</li>
+                                <li>Warranty as per manufacturer policy.</li>
+                                <li>Goods once sold cannot be returned.</li>
+                            </ul>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400">Total Build Cost</p>
+                            <div class="text-6xl font-black font-tech print-gold-text tracking-tighter leading-none mt-1 drop-shadow-sm">
+                                ₹${parseFloat(dataObject.total).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            dom.quoteViewerContent.innerHTML = `
+                <div class="h-full w-full flex flex-row font-sans text-black relative">
+                    <div class="w-auto min-w-[250px] flex flex-col print-sidebar border-r border-[#C5A059] relative text-white h-full">
+                        
+                        <div class="h-32 w-full flex flex-col justify-center items-center relative p-4 shrink-0 border-b border-[#222] bg-transparent">
+                             ${s.logoUrl 
+                                ? `<img src="${s.logoUrl}" class="h-full w-full object-contain bg-transparent">` 
+                                : `<h1 class="text-6xl font-black font-tech italic text-gold-metallic leading-none tracking-tighter" style="transform: skew(-10deg);">ACE</h1>`
+                             }
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col p-4 items-center justify-center relative">
+                            <div class="w-full text-center pb-2 mb-2">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.2em] print-gold-text">System Chassis</p>
+                            </div>
+                            <div class="w-full flex items-center justify-center">
+                                ${cabinetImg ? `<img src="${cabinetImg}" class="w-48 max-h-[400px] object-contain drop-shadow-2xl z-10">` : `<p class="text-neutral-500 text-xs font-mono">NO VISUAL</p>`}
+                            </div>
+                        </div>
+
+                        <div class="p-8 border-t border-[#222] bg-[#0c0c0c] shrink-0">
+                             <p class="text-[12px] uppercase tracking-widest text-neutral-500 mb-1">Prepared For</p>
+                             <p class="font-bold text-lg uppercase font-tech text-white leading-tight truncate max-w-[220px]">${dataObject.clientName}</p>
+                             <div class="mt-2 text-[10px] text-neutral-400 font-mono space-y-0.5">
+                                <p class="print-gold-text">${displayId}</p>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col p-5 bg-white relative h-full">
+                        <div class="tech-corner-tl print-border-gold"></div>
+                        <div class="tech-corner-br print-border-gold"></div>
+
+                        <div class="flex justify-between items-start border-b-2 border-black pb-8 mb-2 shrink-0">
+                            <div>
+                                <h1 class="text-5xl font-black font-tech uppercase tracking-tighter text-black">${docTitle}</h1>
+                                <p class="text-[12px] font-bold print-gold-bg uppercase tracking-widest bg-black inline-block text-white px-2 py-0.5 mt-1">${idLabel}: ${displayId}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs uppercase tracking-wide font-bold text-neutral-600 mb-1.5">
+                                    <p><span class="text-black">Date:</span> ${formatDate(dataObject.date || dataObject.quoteDate)} <span class="mx-1">|</span> <span class="text-black">Valid:</span> ${formatDate(dataObject.validUntil)}</p>
+                                </div>
+                                <div class="text-[10px] text-neutral-700 font-mono border-t border-neutral-300 pt-1.5">
+                                    <p class="font-bold text-black uppercase truncate text-xs mb-1">${s.address}</p>
+                                    <div class="flex gap-3 justify-end mt-0.5 font-bold">
+                                        <p>${(s.phone || '').replace(/-/g, '')}</p>
+                                        <p class="text-neutral-400">|</p>
+                                        <p>${s.email}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 overflow-hidden">
+                            <table class="w-full text-sm border-collapse table-fixed">
+                                <thead>
+                                    <tr class="print-black-header text-xs uppercase tracking-[0.15em] font-tech">
+                                        <th class="p-2 text-left w-[25%] border-r border-neutral-700">Component</th>
+                                        <th class="p-2 text-left w-[75%]">Specification / Model</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${dataObject.items.map((item, i) => `
+                                        <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-neutral-50'} border-b border-neutral-200">
+                                            <td class="py-1.5 px-2 font-bold text-neutral-900 uppercase text-xs tracking-wide font-tech border-r border-neutral-200">${item.category}</td>
+                                            <td class="py-1.5 px-2 font-semibold text-black font-tech text-sm truncate leading-tight">${item.name || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        ${bottomSection}
+                    </div>
+                </div>
+            `;
+        };
+
+        // --- Settings ---
+        function renderSettings() {
+            const s = state.settings;
+            dom.views.settings.innerHTML = `
+                <h2 class="text-3xl font-black text-white mb-8 font-tech uppercase italic">System <span class="text-gold-metallic">Settings</span></h2>
+                <form onsubmit="window.saveSettings(event)" class="bg-[#0c0c0c] p-8 border border-[#222] max-w-2xl relative shadow-2xl">
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="p-6 border border-dashed border-[#333] bg-[#080808] hover:border-[#C5A059] transition-colors">
+                            <label class="block text-xs font-bold mb-4 text-[#C5A059] uppercase tracking-widest">Brand Mark (Logo)</label>
+                            <div class="flex items-center gap-6">
+                                <div id="settings-logo-preview" class="h-24 w-24 bg-transparent border border-[#222] flex items-center justify-center overflow-hidden">
+                                    ${s.logoUrl 
+                                        ? `<img src="${s.logoUrl}" class="h-full w-full object-contain">` 
+                                        : `<div class="text-2xl font-black font-tech italic text-gold-metallic">ACE</div>`
+                                    }
+                                </div>
+                                <div>
+                                    <input type="file" accept="image/*" onchange="window.handleImageUpload(this, 'settings-logo-preview', (url) => window.tempLogoUrl = url)" class="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:bg-gold-gradient file:text-white file:font-bold file:border-0 hover:file:brightness-110 cursor-pointer mb-2">
+                                    <p class="text-[10px] text-neutral-500">Upload the "ACE" Gold Logo for Print Headers.</p>
+                                    <div id="upload-status-settings" class="text-[10px] text-[#C5A059] mt-2 font-mono hidden">✓ READY</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div><label class="block text-xs font-bold mb-1 text-neutral-500 uppercase tracking-widest">Company Name</label><input name="companyName" value="${s.companyName}" class="w-full p-3 bg-black border border-[#333] text-white focus:border-[#C5A059] outline-none font-tech text-lg transition-colors"></div>
+                        <div><label class="block text-xs font-bold mb-1 text-neutral-500 uppercase tracking-widest">Address Line</label><textarea name="address" class="w-full p-3 bg-black border border-[#333] text-white focus:border-[#C5A059] outline-none font-sans text-sm transition-colors" rows="2">${s.address}</textarea></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1 text-neutral-500 uppercase tracking-widest">Phone</label><input name="phone" value="${s.phone}" class="w-full p-3 bg-black border border-[#333] text-white focus:border-[#C5A059] outline-none font-mono transition-colors"></div>
+                            <div><label class="block text-xs font-bold mb-1 text-neutral-500 uppercase tracking-widest">Email</label><input name="email" value="${s.email}" class="w-full p-3 bg-black border border-[#333] text-white focus:border-[#C5A059] outline-none font-mono transition-colors"></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-gold-gradient text-white font-black uppercase font-tech tracking-wider px-8 py-3 hover:brightness-110 w-full mb-4 rounded-sm shadow-md">Save Configuration</button>
+                </form>
+            `;
+            lucide.createIcons();
+        }
+
+        window.saveSettings = (e) => {
+            e.preventDefault(); const fd = new FormData(e.target);
+            state.settings = { ...state.settings, companyName: fd.get('companyName'), address: fd.get('address'), phone: fd.get('phone'), email: fd.get('email') };
+            if(window.tempLogoUrl) { state.settings.logoUrl = window.tempLogoUrl; window.tempLogoUrl = null; }
+            saveData(); alert('System Updated');
+        };
+
+        // --- COMPRESSED IMAGE UPLOAD ---
+        window.handleImageUpload = (input, previewId, callback) => {
+            if(input.files && input.files[0]) {
+                const statusId = previewId === 'settings-logo-preview' ? 'upload-status-settings' : null;
+                const statusEl = statusId ? document.getElementById(statusId) : null;
+                if(statusEl) { statusEl.innerText = "Processing..."; statusEl.classList.remove('hidden', 'text-[#C5A059]'); statusEl.classList.add('text-neutral-500'); }
+
+                const reader = new FileReader(); reader.readAsDataURL(input.files[0]);
+                reader.onload = (e) => {
+                    const img = new Image(); img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas'); 
+                        let w=img.width, h=img.height, m=300; 
+                        if(w>h){if(w>m){h*=m/w;w=m}}else{if(h>m){w*=m/h;h=m}}
+                        canvas.width=w;canvas.height=h; 
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, w, h);
+                        ctx.drawImage(img,0,0,w,h);
+                        const url = canvas.toDataURL('image/png'); 
+                        if(previewId) document.getElementById(previewId).innerHTML = `<img src="${url}" class="h-full w-full object-contain">`;
+                        if(statusEl) { statusEl.innerText = "✓ READY"; statusEl.classList.remove('text-neutral-500', 'hidden'); statusEl.classList.add('text-[#C5A059]'); }
+                        if(callback) callback(url);
+                    }
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
